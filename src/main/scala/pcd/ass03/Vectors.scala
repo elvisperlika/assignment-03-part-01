@@ -1,13 +1,5 @@
-/*
- *   V2d.java
- *
- * Copyright 2000-2001-2002  aliCE team at deis.unibo.it
- *
- * This software is the proprietary information of deis.unibo.it
- * Use is subject to license terms.
- *
- */
-package simulation
+package pcd.ass03
+
 
 trait Vector2D:
   def x: Double

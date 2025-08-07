@@ -1,15 +1,15 @@
-package simulation;
+package pcd.ass03;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class BoidsPanel extends JPanel {
+public class BoidsPanelJ extends JPanel {
 
-	private BoidsView view; 
-	private BoidsModel model;
+	private BoidsViewJ view; 
+	private BoidsModelJ model;
     private int framerate;
 
-    public BoidsPanel(BoidsView view, BoidsModel model) {
+    public BoidsPanelJ(BoidsViewJ view, BoidsModelJ model) {
     	this.model = model;
     	this.view = view;
     }
@@ -33,7 +33,7 @@ public class BoidsPanel extends JPanel {
         var boids = model.getBoids();
 
         g.setColor(Color.BLUE);
-        for (Boid boid : boids) {
+        for (BoidJ boid : boids) {
         	var x = boid.getPos().x();
         	var y = boid.getPos().y();
         	int px = (int)(w/2 + x*xScale);

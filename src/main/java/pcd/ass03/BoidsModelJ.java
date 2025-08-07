@@ -1,12 +1,12 @@
-package simulation;
+package pcd.ass03;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BoidsModel {
+public class BoidsModelJ {
 
-    private List<Boid> boids;
+    private List<BoidJ> boids;
     private double separationWeight;
     private double alignmentWeight;
     private double cohesionWeight;
@@ -16,15 +16,15 @@ public class BoidsModel {
     private final double perceptionRadius;
     private final double avoidRadius;
 
-    public BoidsModel(int nBoids,
-                      double initialSeparationWeight,
-                      double initialAlignmentWeight,
-                      double initialCohesionWeight,
-                      double width,
-                      double height,
-                      double maxSpeed,
-                      double perceptionRadius,
-                      double avoidRadius) {
+    public BoidsModelJ(int nBoids,
+                       double initialSeparationWeight,
+                       double initialAlignmentWeight,
+                       double initialCohesionWeight,
+                       double width,
+                       double height,
+                       double maxSpeed,
+                       double perceptionRadius,
+                       double avoidRadius) {
         separationWeight = initialSeparationWeight;
         alignmentWeight = initialAlignmentWeight;
         cohesionWeight = initialCohesionWeight;
@@ -37,17 +37,17 @@ public class BoidsModel {
         boids = Collections.synchronizedList(generateBoids(nBoids));
     }
 
-    private List<Boid> generateBoids(int nBoids) {
-        List<Boid> boids = new ArrayList<Boid>();
+    private List<BoidJ> generateBoids(int nBoids) {
+        List<BoidJ> boids = new ArrayList<BoidJ>();
         for (int i = 0; i < nBoids; i++) {
-            P2d pos = new P2d(-width / 2 + Math.random() * width, -height / 2 + Math.random() * height);
-            V2d vel = new V2d(Math.random() * maxSpeed / 2 - maxSpeed / 4, Math.random() * maxSpeed / 2 - maxSpeed / 4);
-            boids.add(new Boid(pos, vel));
+            P2dJ pos = new P2dJ(-width / 2 + Math.random() * width, -height / 2 + Math.random() * height);
+            V2dJ vel = new V2dJ(Math.random() * maxSpeed / 2 - maxSpeed / 4, Math.random() * maxSpeed / 2 - maxSpeed / 4);
+            boids.add(new BoidJ(pos, vel));
         }
         return boids;
     }
 
-    public List<Boid> getBoids() {
+    public List<BoidJ> getBoids() {
         return new ArrayList<>(boids);
     }
 

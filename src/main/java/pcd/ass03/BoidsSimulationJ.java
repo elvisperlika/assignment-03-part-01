@@ -1,8 +1,8 @@
-package simulation;
+package pcd.ass03;
 
 import java.awt.*;
 
-public class BoidsSimulation {
+public class BoidsSimulationJ {
 
 	final static int N_BOIDS = 1000;
 
@@ -21,15 +21,15 @@ public class BoidsSimulation {
 	final static int SCREEN_HEIGHT = 600;
     
     public static void main(String[] args) {
-    	var model = new BoidsModel(
+    	var model = new BoidsModelJ(
     					N_BOIDS, 
     					SEPARATION_WEIGHT, ALIGNMENT_WEIGHT, COHESION_WEIGHT, 
     					ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT,
     					MAX_SPEED,
     					PERCEPTION_RADIUS,
     					AVOID_RADIUS); 
-    	var sim = new BoidsSimulatorController(model);
-    	var view = new BoidsView(model, SCREEN_WIDTH, SCREEN_HEIGHT, N_BOIDS);
+    	var sim = new BoidsSimulatorControllerJ(model);
+    	var view = new BoidsViewJ(model, SCREEN_WIDTH, SCREEN_HEIGHT, N_BOIDS);
     	sim.attachView(view);
     	sim.runSimulation();
     }

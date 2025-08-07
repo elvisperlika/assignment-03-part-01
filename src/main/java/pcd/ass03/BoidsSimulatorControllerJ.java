@@ -1,23 +1,23 @@
-package simulation;
+package pcd.ass03;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BoidsSimulatorController {
+public class BoidsSimulatorControllerJ {
 
-    private final BoidsModel model;
-    private Optional<BoidsView> view;
+    private final BoidsModelJ model;
+    private Optional<BoidsViewJ> view;
     private static final int FRAMERATE = 50;
     private int framerate;
     private long t0;
     private boolean isTime0Updated = false;
 
-    public BoidsSimulatorController(BoidsModel model) {
+    public BoidsSimulatorControllerJ(BoidsModelJ model) {
         this.model = model;
         view = Optional.empty();
     }
 
-    public void attachView(BoidsView view) {
+    public void attachView(BoidsViewJ view) {
     	this.view = Optional.of(view);
     }
 
@@ -26,14 +26,14 @@ public class BoidsSimulatorController {
             if (view.isPresent()) {
                 view.get().update(framerate);
                 var t0 = System.currentTimeMillis();
-                List<Boid> boids = model.getBoids();
-                for(Boid boid : boids)
+                List<BoidJ> boids = model.getBoids();
+                for(BoidJ boid : boids)
                     boid.calculateVelocity(model);
 
-                for(Boid boid : boids)
+                for(BoidJ boid : boids)
                     boid.updateVelocity(model);
 
-                for(Boid boid : boids)
+                for(BoidJ boid : boids)
                     boid.updatePosition(model);
                 updateFrameRate(t0);
             }

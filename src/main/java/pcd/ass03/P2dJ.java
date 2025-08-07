@@ -1,4 +1,4 @@
-package simulation;
+package pcd.ass03;
 
 /**
  *
@@ -6,18 +6,18 @@ package simulation;
  * objects are completely state-less
  *
  */
-public record P2d(double x, double y) {
+public record P2dJ(double x, double y) {
 
 
-    public P2d sum(V2d v){
-        return new P2d(x+v.x(),y+v.y());
+    public P2dJ sum(V2dJ v){
+        return new P2dJ(x+v.x(),y+v.y());
     }
 
-    public V2d sub(P2d v){
-        return new V2d(x-v.x,y-v.y);
+    public V2dJ sub(P2dJ v){
+        return new V2dJ(x-v.x,y-v.y);
     }
     
-    public double distance(P2d p) {
+    public double distance(P2dJ p) {
     	double dx = p.x - x;
     	double dy = p.y - y;
     	return Math.sqrt(dx*dx + dy*dy);

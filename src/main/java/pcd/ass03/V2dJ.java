@@ -1,4 +1,4 @@
-/*
+package pcd.ass03;/*
  *   V2d.java
  *
  * Copyright 2000-2001-2002  aliCE team at deis.unibo.it
@@ -7,7 +7,6 @@
  * Use is subject to license terms.
  *
  */
-package simulation;
 
 /**
  *
@@ -15,23 +14,23 @@ package simulation;
  * objects are completely state-less
  *
  */
-public record V2d(double x,double y) {
+public record V2dJ(double x, double y) {
 
-    public V2d sum(V2d v){
-        return new V2d(x+v.x,y+v.y);
+    public V2dJ sum(V2dJ v){
+        return new V2dJ(x+v.x,y+v.y);
     }
 
     public double abs(){
         return (double)Math.sqrt(x*x+y*y);
     }
 
-    public V2d getNormalized(){
+    public V2dJ getNormalized(){
         double module=(double)Math.sqrt(x*x+y*y);
-        return new V2d(x/module,y/module);
+        return new V2dJ(x/module,y/module);
     }
 
-    public V2d mul(double fact){
-        return new V2d(x*fact,y*fact);
+    public V2dJ mul(double fact){
+        return new V2dJ(x*fact,y*fact);
     }
 
     public String toString(){

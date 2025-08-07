@@ -1,27 +1,27 @@
-package simulation;
+package pcd.ass03;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Hashtable;
 
-public class BoidsView {
+public class BoidsViewJ {
 
     public static final String PAUSE_STRING = "PAUSE";
     private static final String PLAY_STRING = "PLAY";
     private static final String RESET_STRING = "RESET";
     private final JButton resetButton;
     private JFrame frame;
-    private BoidsPanel boidsPanel;
+    private BoidsPanelJ boidsPanel;
     private JSlider cohesionSlider, separationSlider, alignmentSlider;
     private JTextField nBoidsTextField;
     private JButton playButton;
-    private BoidsModel model;
+    private BoidsModelJ model;
     private int width, height;
     private boolean isRunning = false;
     private int nBoids;
     private boolean isResetButtonPressed = false;
 
-    public BoidsView(BoidsModel model, int width, int height, int nBoids) {
+    public BoidsViewJ(BoidsModelJ model, int width, int height, int nBoids) {
         this.model = model;
         this.width = width;
         this.height = height;
@@ -35,7 +35,7 @@ public class BoidsView {
         LayoutManager layout = new BorderLayout();
         cp.setLayout(layout);
 
-        boidsPanel = new BoidsPanel(this, model);
+        boidsPanel = new BoidsPanelJ(this, model);
         cp.add(BorderLayout.CENTER, boidsPanel);
 
         JPanel slidersPanel = new JPanel();
