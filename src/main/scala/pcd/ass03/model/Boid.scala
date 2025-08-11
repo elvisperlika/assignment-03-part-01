@@ -1,7 +1,8 @@
-package pcd.ass03
+package pcd.ass03.model
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
+import pcd.ass03.utils.{P2d, V2d}
 
 /** Boid is primary entity of the simulation.
   *

@@ -1,6 +1,7 @@
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import pcd.ass03.{Boid, P2d, V2d}
+import pcd.ass03.model.Boid
+import pcd.ass03.utils.{P2d, V2d}
 
 class BoidTest extends AnyFlatSpec with should.Matchers:
   

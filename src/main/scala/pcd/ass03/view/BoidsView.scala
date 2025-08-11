@@ -1,4 +1,10 @@
-package pcd.ass03
+package pcd.ass03.view
+
+import pcd.ass03.utils.SimulationParameters.{
+  ENVIRONMENT_HEIGHT,
+  ENVIRONMENT_WIDTH
+}
+import pcd.ass03.utils.SimulationParameters
 
 import scala.swing.*
 
@@ -7,8 +13,7 @@ class BoidsView extends MainFrame:
   import SimulationParameters.*
   preferredSize = new Dimension(ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT)
 
-  val drawablePanel = new Panel:
-    background = java.awt.Color.WHITE
+  val drawablePanel: BoidsPanel = new BoidsPanel
 
   val playPauseButton = new Button("Play")
 
@@ -26,17 +31,18 @@ class BoidsView extends MainFrame:
 
   val resetButton = new Button("Reset")
 
+  val commandPanel = new FlowPanel(
+    playPauseButton,
+    nBoidsField,
+    new Label("Separation"),
+    separtionSlider,
+    new Label("Alignment"),
+    alignmentSlider,
+    new Label("Cohesion"),
+    cohesionSlider,
+    resetButton
+  )
+
   contents = new BorderPanel:
     layout(drawablePanel) = BorderPanel.Position.Center
-    layout(new FlowPanel(
-      playPauseButton,
-      nBoidsField,
-      new Label("Separation"),
-      separtionSlider,
-      new Label("Alignment"),
-      alignmentSlider,
-      new Label("Cohesion"),
-      cohesionSlider,
-      resetButton
-    )) =
-      BorderPanel.Position.South
+    layout(commandPanel) = BorderPanel.Position.South

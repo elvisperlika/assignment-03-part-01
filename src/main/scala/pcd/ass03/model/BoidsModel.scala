@@ -1,8 +1,9 @@
-package pcd.ass03
+package pcd.ass03.model
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
-import pcd.ass03.BoidsSimulator.Loop
+import pcd.ass03.controller.BoidsSimulator.SimulationMessage
+import pcd.ass03.utils.{P2d, V2d}
 
 class BoidsModel(
     var nBoids: Int,
@@ -18,11 +19,11 @@ class BoidsModel(
   var boids: Seq[Boid] = Seq()
   var boidsRef: Seq[ActorRef[BoidActor.BoidTask]] = Seq()
 
-  def generateBoids(context: ActorContext[Loop]): Unit =
+  def generateBoids(context: ActorContext[SimulationMessage]): Unit =
     boids =
       for
         i <- 0 until nBoids
-        pos = P2d(getMinX + Math.random * width, getMinY + Math.random * height)
+        pos = P2d(0 + Math.random * width, 0 + Math.random * height)
         vel = V2d(
           Math.random * maxSpeed / 2 - maxSpeed / 4,
           Math.random * maxSpeed / 2 - maxSpeed / 4

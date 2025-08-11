@@ -1,5 +1,4 @@
-package pcd.ass03
-
+package pcd.ass03.utils
 
 trait Vector2D:
   def x: Double

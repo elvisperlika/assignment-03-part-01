@@ -1,4 +1,4 @@
-package pcd.ass03
+package pcd.ass03.utils
 
 /** Parameters of the simulation.
   */
