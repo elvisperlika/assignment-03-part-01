@@ -1,13 +1,41 @@
 package pcd.ass03
 
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.ActorContext
+import pcd.ass03.BoidsSimulator.Loop
+
 class BoidsModel(
-    val nBoids: Int,
+    var nBoids: Int,
     val separationWeight: Double,
     val alignmentWeight: Double,
     val cohesionWeight: Double,
-    val environmentWidth: Int,
-    val environmentHeight: Int,
+    val width: Int,
+    val height: Int,
     val maxSpeed: Double,
     val perceptionRadius: Double,
     val avoidRadius: Double
-) {}
+):
+  var boids: Seq[Boid] = Seq()
+  var boidsRef: Seq[ActorRef[BoidActor.BoidTask]] = Seq()
+
+  def generateBoids(context: ActorContext[Loop]): Unit =
+    boids =
+      for
+        i <- 0 until nBoids
+        pos = P2d(getMinX + Math.random * width, getMinY + Math.random * height)
+        vel = V2d(
+          Math.random * maxSpeed / 2 - maxSpeed / 4,
+          Math.random * maxSpeed / 2 - maxSpeed / 4
+        )
+      yield Boid(pos, vel)
+    boidsRef =
+      for
+        (b, i) <- boids.zipWithIndex
+      yield context spawn (BoidActor(b), s"boid-$i")
+
+  def getMinX: Double = -width / 2
+  def getMaxX: Double = width / 2
+  def getMinY: Double = -height / 2
+  def getMaxY: Double = height / 2
+
+  def setBoidsNumber(n: Int): Unit = nBoids = n

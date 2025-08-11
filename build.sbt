@@ -12,7 +12,8 @@ libraryDependencies ++= Seq(
   akkaGroup %% "akka-actor-typed" % akkaVersion,
   akkaGroup %% "akka-actor-testkit-typed" % akkaVersion % Test,
   "ch.qos.logback" % "logback-classic" % "1.5.18",
-  "org.scalatest" %% "scalatest" % "3.2.19" % Test
+  "org.scalatest" %% "scalatest" % "3.2.19" % Test,
+  "org.scala-lang.modules" %% "scala-swing" % "3.0.0"
 )
 
 lazy val root = (project in file("."))
