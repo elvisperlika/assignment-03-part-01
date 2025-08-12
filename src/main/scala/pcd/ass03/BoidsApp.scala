@@ -21,6 +21,6 @@ object BoidsApp extends SimpleSwingApplication:
     PERCEPTION_RADIUS,
     AVOID_RADIUS
   )
-  val view = new BoidsView()
+  val view = new BoidsView(ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT)
   val system = ActorSystem(ControllerActor(model, view), "sim-controller")
   def top: Frame = view

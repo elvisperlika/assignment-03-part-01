@@ -1,26 +1,19 @@
 package pcd.ass03.view
 
-import pcd.ass03.utils.SimulationParameters.{
-  ENVIRONMENT_HEIGHT,
-  ENVIRONMENT_WIDTH
-}
-import pcd.ass03.utils.SimulationParameters
-
 import scala.swing.*
 
-class BoidsView extends MainFrame:
+class BoidsView(width: Int, height: Int) extends MainFrame:
   title = "Boids Simulation"
-  import SimulationParameters.*
-  preferredSize = new Dimension(ENVIRONMENT_WIDTH, ENVIRONMENT_HEIGHT)
+  preferredSize = new Dimension(width, height)
 
   val drawablePanel: BoidsPanel = new BoidsPanel
 
   val playPauseButton = new Button("Play")
 
-  val nBoidsField = new TextField:
+  val nBoidsField: TextField = new TextField:
     columns = 7
 
-  def makeSlider(): Slider = new Slider:
+  private def makeSlider(): Slider = new Slider:
     min = 0
     max = 20
     value = 10
