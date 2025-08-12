@@ -7,9 +7,9 @@ import pcd.ass03.utils.{P2d, V2d}
 
 class BoidsModel(
     var nBoids: Int,
-    val separationWeight: Double,
-    val alignmentWeight: Double,
-    val cohesionWeight: Double,
+    var separationWeight: Double,
+    var alignmentWeight: Double,
+    var cohesionWeight: Double,
     val width: Int,
     val height: Int,
     val maxSpeed: Double,
@@ -23,7 +23,7 @@ class BoidsModel(
     boids =
       for
         i <- 0 until nBoids
-        pos = P2d(getMinX + Math.random * width, getMinY + Math.random * height)
+        pos = P2d(0 + Math.random * width, 0 + Math.random * height)
         vel = V2d(
           Math.random * maxSpeed / 2 - maxSpeed / 4,
           Math.random * maxSpeed / 2 - maxSpeed / 4

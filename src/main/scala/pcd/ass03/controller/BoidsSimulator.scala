@@ -14,8 +14,7 @@ object BoidsSimulator:
     case UpdateParameters(
         separation: Int,
         alignment: Int,
-        cohesion: Int,
-        nBoids: Int
+        cohesion: Int
     )
     case Play
     case Pause
@@ -42,35 +41,33 @@ object BoidsSimulator:
       Behaviors receive: (context, message) =>
         message match
           case SimulationMessage.Play if paused =>
-            println("Play")
             context.self ! SimulationMessage.Tick
             running(model, drawer, dashboard, paused = false)
 
           case SimulationMessage.Tick if !paused =>
-            println("Tick")
-            model.boidsRef.foreach: b =>
+            model.boidsRef foreach: b =>
               b ! BoidTask.CalcVelocity(model, context.self)
-            model.boidsRef.foreach: b =>
+            model.boidsRef foreach: b =>
               b ! BoidTask.UpdVelocity(model, context.self)
-            model.boidsRef.foreach: b =>
+            model.boidsRef foreach: b =>
               b ! BoidTask.UpdPosition(model, context.self)
             drawer ! DrawBoids(model.boids.map(_.pos))
             context.self ! SimulationMessage.Tick
             Behaviors.same
 
           case SimulationMessage.Pause if !paused =>
-            println("Pause")
             running(model, drawer, dashboard, paused = true)
 
-          case SimulationMessage.UpdateParameters(_, _, _, _) =>
-            println("Update Parameters")
+          case SimulationMessage.UpdateParameters(sep, ali, coh) =>
+            model.separationWeight = sep
+            model.alignmentWeight = ali
+            model.cohesionWeight = coh
             Behaviors.same
 
           case SimulationMessage.Reset =>
-            println("Reset")
-            model.boidsRef.foreach: b =>
-              b ! BoidTask.Kill
-            model.generateBoids(context)
+            model.boidsRef foreach: b =>
+              b ! BoidTask.Kill(context.self)
+            model generateBoids (context)
             drawer ! DrawMessage.DrawBoids(model.boids.map(_.pos))
             Behaviors.same
 

@@ -18,7 +18,7 @@ class BoidsView(width: Int, height: Int) extends MainFrame:
     max = 20
     value = 10
 
-  val separtionSlider: Slider = makeSlider()
+  val separationSlider: Slider = makeSlider()
   val alignmentSlider: Slider = makeSlider()
   val cohesionSlider: Slider = makeSlider()
 
@@ -28,7 +28,7 @@ class BoidsView(width: Int, height: Int) extends MainFrame:
     playPauseButton,
     nBoidsField,
     new Label("Separation"),
-    separtionSlider,
+    separationSlider,
     new Label("Alignment"),
     alignmentSlider,
     new Label("Cohesion"),

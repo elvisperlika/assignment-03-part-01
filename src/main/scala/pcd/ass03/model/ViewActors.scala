@@ -3,11 +3,10 @@ package pcd.ass03.model
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import pcd.ass03.controller.BoidsSimulator.SimulationMessage
-import pcd.ass03.controller.BoidsSimulator.SimulationMessage.Reset
 import pcd.ass03.utils.P2d
 import pcd.ass03.view.{BoidsPanel, BoidsView}
 
-import scala.swing.event.ButtonClicked
+import scala.swing.event.{ButtonClicked, Event, ValueChanged}
 
 object ViewActors:
 
@@ -37,6 +36,20 @@ object ViewActors:
           case ButtonClicked(_) =>
             controllerActor ! SimulationMessage.Reset
         }
+
+        val sliderReaction: PartialFunction[Event, Unit] = {
+          case ValueChanged(_) =>
+            controllerActor ! SimulationMessage.UpdateParameters(
+              separation = view.separationSlider.value,
+              alignment = view.alignmentSlider.value,
+              cohesion = view.cohesionSlider.value
+            )
+        }
+
+        view.separationSlider.reactions += sliderReaction
+        view.alignmentSlider.reactions += sliderReaction
+        view.cohesionSlider.reactions += sliderReaction
+
         Behaviors.empty
 
   import scala.swing.Swing
