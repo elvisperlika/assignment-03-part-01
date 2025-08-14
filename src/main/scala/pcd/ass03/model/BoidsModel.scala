@@ -2,7 +2,7 @@ package pcd.ass03.model
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
-import pcd.ass03.controller.BoidsSimulator.SimulationMessage
+import pcd.ass03.controller.BoidsSimulator.SimulationPhase
 import pcd.ass03.model.BoidActor.Command
 import pcd.ass03.utils.{P2d, V2d}
 
@@ -20,7 +20,7 @@ class BoidsModel(
   var boids: Seq[Boid] = Seq()
   var boidsRef: Seq[ActorRef[Command]] = Seq()
 
-  def generateBoids(context: ActorContext[SimulationMessage]): Unit =
+  def generateBoids(context: ActorContext[SimulationPhase]): Unit =
     boids =
       for
         i <- 0 until nBoids
