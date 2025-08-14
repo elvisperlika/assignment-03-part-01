@@ -3,6 +3,7 @@ package pcd.ass03.model
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import pcd.ass03.controller.BoidsSimulator.SimulationMessage
+import pcd.ass03.model.BoidActor.Command
 import pcd.ass03.utils.{P2d, V2d}
 
 class BoidsModel(
@@ -17,7 +18,7 @@ class BoidsModel(
     val avoidRadius: Double
 ):
   var boids: Seq[Boid] = Seq()
-  var boidsRef: Seq[ActorRef[BoidActor.BoidTask]] = Seq()
+  var boidsRef: Seq[ActorRef[Command]] = Seq()
 
   def generateBoids(context: ActorContext[SimulationMessage]): Unit =
     boids =
@@ -35,8 +36,11 @@ class BoidsModel(
       yield context spawn (BoidActor(b), s"boid-$i")
 
   def getMinX: Double = -width / 2
+  
   def getMaxX: Double = width / 2
+  
   def getMinY: Double = -height / 2
+  
   def getMaxY: Double = height / 2
 
   def setBoidsNumber(n: Int): Unit = nBoids = n
