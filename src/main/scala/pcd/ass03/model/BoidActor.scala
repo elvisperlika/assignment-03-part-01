@@ -17,61 +17,67 @@ object BoidActor:
       actorRef: ActorRef[TaskDone]
   ) extends Command
   case class RequestUpdVelocity(
-      aliWeight: Double,
       sepWeight: Double,
+      aliWeight: Double,
       cohWeight: Double,
       maxSpeed: Double,
       actorRef: ActorRef[TaskDone]
   ) extends Command
-  case class RequestUpdPosition(actorRef: ActorRef[TaskDone]) extends Command
-  case class Kill(actorRef: ActorRef[TaskDone]) extends Command
+  case class RequestUpdPosition(
+      width: Double,
+      height: Double,
+      actorRef: ActorRef[TaskDone]
+  ) extends Command
+  case class Kill() extends Command
 
   trait Reply
   case class TaskDone() extends Reply
 
   def apply(initial: Boid): Behavior[Command] = Behaviors.setup: _ =>
-    active(initial)
+    active(initial, v2d(0), v2d(0), v2d(0))
+
+  type Separation = V2d
+  type Alignment = V2d
+  type Cohesion = V2d
 
   private def active(
-      boid: Boid,
-      sep: V2d = v2d(0),
-      ali: V2d = v2d(0),
-      coh: V2d = v2d(0)
+      _boid: Boid,
+      _sep: Separation,
+      _ali: Alignment,
+      _coh: Cohesion
   ): Behavior[Command] = Behaviors.receive: (cxt, msg) =>
     msg match
       case RequestBoid(ref) =>
-        ref ! boid
+        ref ! _boid
         Behaviors.same
 
       case RequestCalcVelocity(boids, avoidRadius, perceptionRadius, ref) =>
-        val (sep, ali, coh) =
-          calcVelocity(boid, boids, avoidRadius, perceptionRadius)
+        val (newSep, newAli, newCoh) =
+          calcVelocity(_boid, boids, avoidRadius, perceptionRadius)
         ref ! TaskDone()
-        active(boid, sep, ali, coh)
+        active(_boid, newSep, newAli, newCoh)
 
-      case RequestUpdVelocity(aliW, sepW, cohW, maxSpeed, ref) =>
+      case RequestUpdVelocity(sepW, aliW, cohW, maxSpeed, ref) =>
         val updBoid =
-          updVelocity(boid, ali, sep, coh, aliW, sepW, cohW, maxSpeed)
+          updVelocity(_boid, _sep, _ali, _coh, sepW, aliW, cohW, maxSpeed)
         ref ! TaskDone()
-        active(updBoid, sep, ali, coh)
+        active(updBoid, _sep, _ali, _coh)
 
-      case RequestUpdPosition(ref) =>
-        val updBoid = updPosition(boid)
+      case RequestUpdPosition(width, height, ref) =>
+        val updBoid = updPosition(width, height, _boid)
         ref ! TaskDone()
-        active(updBoid, sep, ali, coh)
+        active(updBoid, _sep, _ali, _coh)
 
-      case Kill(ref) =>
-        ref ! TaskDone()
-        Behaviors.stopped
+      case Kill() => Behaviors.stopped
 
   private def calcVelocity(
       boid: Boid,
       boids: Seq[Boid],
       avoidRadius: Double,
       perceptionRadius: Double
-  ): (V2d, V2d, V2d) =
+  ): (Separation, Alignment, Cohesion) =
     val neighborhood = boids.filter: b =>
-      b != boid && boid.pos.distance(b.pos) < perceptionRadius
+      b.id != boid.id && boid.pos.distance(b.pos) < perceptionRadius
     (
       boid.calculateSeparation(neighborhood, avoidRadius),
       boid.calculateAlignment(neighborhood),
@@ -80,33 +86,32 @@ object BoidActor:
 
   private def updVelocity(
       boid: Boid,
-      ali: V2d,
-      sep: V2d,
-      coh: V2d,
-      aliWeight: Double,
+      sep: Separation,
+      ali: Alignment,
+      coh: Cohesion,
       sepWeight: Double,
+      aliWeight: Double,
       cohWeight: Double,
       maxSpeed: Double
   ): Boid =
-    var updBoid = boid.copy(vel =
-      boid.vel
-        + (ali * aliWeight)
-        + (sep * sepWeight)
-        + (coh * cohWeight)
+    // println(s"-> $aliWeight - $sepWeight - $cohWeight")
+    val updBoid = boid.copy(vel =
+      boid.vel + (ali * aliWeight) + (sep * sepWeight) + (coh * cohWeight)
     )
     val speed = updBoid.vel.abs
     if speed > maxSpeed then
-      updBoid = boid.copy(vel = updBoid.vel.norm * maxSpeed)
-    updBoid
+      updBoid.copy(vel = updBoid.vel.norm * maxSpeed)
+    else
+      updBoid
 
-  private def updPosition(boid: Boid): Boid =
-    boid.copy(pos = boid.pos + boid.vel)
-  // TODO: fix below
-  /* if (boid.pos.x < model.getMinX)
-      boid.pos = boid.pos + V2d(model.width, 0)
-    if (boid.pos.x >= model.getMaxX)
-      boid.pos = boid.pos + V2d(-model.width, 0)
-    if (boid.pos.y < model.getMinY)
-      boid.pos = boid.pos + V2d(0, model.height)
-    if (boid.pos.y >= model.getMaxY)
-      boid.pos = boid.pos + V2d(0, -model.height) */
+  private def updPosition(width: Double, height: Double, boid: Boid): Boid =
+    var updBoid = boid.copy(pos = boid.pos + boid.vel)
+    if (updBoid.pos.x < 0)
+      updBoid = updBoid.copy(updBoid.pos + V2d(width, 0))
+    if (updBoid.pos.x >= width)
+      updBoid = updBoid.copy(updBoid.pos + V2d(-width, 0))
+    if (updBoid.pos.y < 0)
+      updBoid = updBoid.copy(updBoid.pos + V2d(0, height))
+    if (updBoid.pos.y >= height)
+      updBoid = updBoid.copy(updBoid.pos + V2d(0, -height))
+    updBoid

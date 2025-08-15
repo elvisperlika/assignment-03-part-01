@@ -31,16 +31,16 @@ class BoidsModel(
         )
       yield Boid(pos, vel)
     boidsRef =
-      for
-        (b, i) <- boids.zipWithIndex
+      for (b, i) <- boids.zipWithIndex
       yield context spawn (BoidActor(b), s"boid-$i")
+    boidsRef.foreach { br => context watch br }
 
   def getMinX: Double = -width / 2
-  
+
   def getMaxX: Double = width / 2
-  
+
   def getMinY: Double = -height / 2
-  
+
   def getMaxY: Double = height / 2
 
   def setBoidsNumber(n: Int): Unit = nBoids = n

@@ -4,23 +4,8 @@ import akka.actor.typed.scaladsl.AskPattern.*
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, Scheduler}
 import akka.util.Timeout
-import pcd.ass03.model.BoidActor.{
-  Kill,
-  RequestBoid,
-  RequestCalcVelocity,
-  RequestUpdPosition,
-  RequestUpdVelocity,
-  TaskDone
-}
-import pcd.ass03.model.ViewActors.{
-  Commands,
-  Dashboard,
-  DrawBoids,
-  DrawBoidsWithResponse,
-  DrawMessage,
-  Drawer,
-  Drew
-}
+import pcd.ass03.model.BoidActor.*
+import pcd.ass03.model.ViewActors.*
 import pcd.ass03.model.{Boid, BoidsModel}
 import pcd.ass03.view.BoidsView
 
@@ -30,8 +15,11 @@ import scala.util.{Failure, Success}
 
 object BoidsSimulator:
   trait SimulationPhase
-  case class UpdateParameters(separation: Int, alignment: Int, cohesion: Int)
-      extends SimulationPhase
+  case class UpdateParameters(
+      separation: Double,
+      alignment: Double,
+      cohesion: Double
+  ) extends SimulationPhase
   case class Play() extends SimulationPhase
   case class Pause() extends SimulationPhase
   case class Reset() extends SimulationPhase
@@ -46,7 +34,7 @@ object BoidsSimulator:
       val drawer = context.spawn(Drawer(view.drawablePanel), "drawer")
       val dashboard = context.spawn(Dashboard(view, context.self), "dashboard")
       drawer ! DrawBoids(model.boids.map(_.pos))
-      running(model, drawer, dashboard, true)
+      running(model, drawer, dashboard, paused = true)
 
     private def running(
         model: BoidsModel,
@@ -64,74 +52,21 @@ object BoidsSimulator:
           given Scheduler = context.system.scheduler
           given ExecutionContext = context.executionContext
 
-          /* REQUEST CALCULATION VELOCITIES */
-          val futureCalcVelocityTask: Seq[Future[TaskDone]] =
-            model.boidsRef.map: b =>
-              val boids: Seq[Boid] = Seq.from(model.boids)
-              b.ask(replyTo =>
-                RequestCalcVelocity(
-                  boids,
-                  model.avoidRadius,
-                  model.perceptionRadius,
-                  replyTo
-                )
-              )
-          val allFutureCalcVelocityTask: Future[Seq[TaskDone]] =
-            Future.sequence(futureCalcVelocityTask)
-          allFutureCalcVelocityTask.onComplete {
+          val simulationStep =
+            for
+              _ <- requestCalculateVelocities(model)
+              _ <- requestUpdateVelocities(model)
+              _ <- requestUpdatePositions(model)
+              boids <- updateModelBoids(model)
+              _ = model.boids = boids
+            yield ()
+
+          simulationStep.onComplete {
             case Failure(exception) => println(s"ERROR: $exception")
-            case _                  =>
+            case Success(_)         =>
+              drawer ! DrawBoids(model.boids.map(_.pos))
+              context.scheduleOnce(15.millis, context.self, Tick())
           }
-
-          /* REQUEST UPDATE VELOCITIES */
-          val futureUpdVelocityTask: Seq[Future[TaskDone]] =
-            model.boidsRef.map: b =>
-              val boids: Seq[Boid] = Seq.from(model.boids)
-              b.ask(replyTo =>
-                RequestUpdVelocity(
-                  model.alignmentWeight,
-                  model.separationWeight,
-                  model.cohesionWeight,
-                  model.maxSpeed,
-                  replyTo
-                )
-              )
-          val allFutureUpdVelocityTask: Future[Seq[TaskDone]] =
-            Future.sequence(futureUpdVelocityTask)
-          allFutureCalcVelocityTask.onComplete {
-            case Failure(exception) => println(s"ERROR: $exception")
-            case _                  =>
-          }
-
-          /* REQUEST UPDATE POSITIONS */
-          val futureUpdPositionTask: Seq[Future[TaskDone]] =
-            model.boidsRef.map: b =>
-              b.ask(replyTo => RequestUpdPosition(replyTo))
-          val allFutureUpdPositionTask: Future[Seq[TaskDone]] =
-            Future.sequence(futureUpdPositionTask)
-          allFutureUpdPositionTask.onComplete {
-            case Failure(exception) => println(s"ERROR: $exception")
-            case Success(value)     =>
-          }
-
-          /* UPDATE POSITIONS */
-          val futureBoids: Seq[Future[Boid]] = model.boidsRef.map: b =>
-            b.ask(replyTo => RequestBoid(replyTo))
-          val allfutureBoids: Future[Seq[Boid]] = Future.sequence(futureBoids)
-          allfutureBoids.onComplete {
-            case Failure(exception) => println(s"ERROR: $exception")
-            case Success(boids)     => model.boids = boids
-          }
-
-          val futureDraw: Future[Drew] =
-            drawer.ask(replyTo =>
-              DrawBoidsWithResponse(model.boids.map(_.pos), replyTo)
-            )
-          futureDraw.onComplete {
-            case Failure(exception) => println(s"ERROR $exception")
-            case _                  => context.self ! Tick()
-          }
-
           Behaviors.same
 
         case Pause() if !paused =>
@@ -144,11 +79,64 @@ object BoidsSimulator:
           Behaviors.same
 
         case Reset() =>
-//          model.boidsRef foreach: b =>
-//            b ! Kill(context.self)
-          model generateBoids context
-          drawer ! DrawBoids(model.boids.map(_.pos))
+          model.boidsRef.foreach(_ ! Kill())
+          if model.boidsRef.isEmpty then
+            model generateBoids context
+            drawer ! DrawBoids(model.boids.map(_.pos))
           Behaviors.same
 
         case _ =>
           Behaviors.same
+
+private def requestCalculateVelocities(model: BoidsModel)(using
+    Timeout,
+    Scheduler,
+    ExecutionContext
+): Future[Seq[TaskDone]] =
+  val tasks: Seq[Future[TaskDone]] = model.boidsRef.map: b =>
+    val boids = Seq.from(model.boids)
+    b.ask(replyTo =>
+      RequestCalcVelocity(
+        boids,
+        model.avoidRadius,
+        model.perceptionRadius,
+        replyTo
+      )
+    )
+  Future.sequence(tasks)
+
+private def requestUpdateVelocities(model: BoidsModel)(using
+    Timeout,
+    Scheduler,
+    ExecutionContext
+): Future[Seq[TaskDone]] =
+  val tasks: Seq[Future[TaskDone]] = model.boidsRef.map: b =>
+    val boids = Seq.from(model.boids)
+    b.ask(replyTo =>
+      RequestUpdVelocity(
+        model.separationWeight,
+        model.alignmentWeight,
+        model.cohesionWeight,
+        model.maxSpeed,
+        replyTo
+      )
+    )
+  Future.sequence(tasks)
+
+private def requestUpdatePositions(model: BoidsModel)(using
+    Timeout,
+    Scheduler,
+    ExecutionContext
+): Future[Seq[TaskDone]] =
+  val tasks: Seq[Future[TaskDone]] = model.boidsRef.map: b =>
+    b.ask(replyTo => RequestUpdPosition(model.width, model.height, replyTo))
+  Future.sequence(tasks)
+
+private def updateModelBoids(model: BoidsModel)(using
+    Timeout,
+    Scheduler,
+    ExecutionContext
+): Future[Seq[Boid]] =
+  val tasks: Seq[Future[Boid]] = model.boidsRef.map: b =>
+    b.ask(replyTo => RequestBoid(replyTo))
+  Future.sequence(tasks)

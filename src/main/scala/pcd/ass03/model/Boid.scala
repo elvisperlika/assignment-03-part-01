@@ -2,9 +2,12 @@ package pcd.ass03.model
 
 import pcd.ass03.utils.{P2d, V2d}
 
+import java.util.UUID
+
 case class Boid(
     pos: P2d,
-    vel: V2d
+    vel: V2d,
+    id: UUID = UUID.randomUUID()
 ):
   def calculateAlignment(nearbyBoids: Seq[Boid]): V2d =
     if nearbyBoids.nonEmpty then
