@@ -17,6 +17,10 @@ class BoidsView(width: Int, height: Int) extends MainFrame:
     min = 0
     max = 20
     value = 10
+    majorTickSpacing = 5
+    minorTickSpacing = 1
+    paintTicks = true
+    paintLabels = true
 
   val separationSlider: Slider = makeSlider()
   val alignmentSlider: Slider = makeSlider()

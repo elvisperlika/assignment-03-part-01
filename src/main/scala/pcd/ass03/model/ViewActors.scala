@@ -63,9 +63,6 @@ object ViewActors:
 
   trait DrawMessage
   case class DrawBoids(positions: Seq[P2d]) extends DrawMessage
-  case class DrawBoidsWithResponse(positions: Seq[P2d], ref: ActorRef[Drew])
-      extends DrawMessage
-  case class Drew() extends DrawMessage
 
   /** Actor that draw the simulation on the view.
     */
@@ -76,8 +73,4 @@ object ViewActors:
           case DrawBoids(positions) =>
             panel.updatePositions(positions)
             Swing.onEDT { panel.repaint() }
-          case DrawBoidsWithResponse(positions, ref) =>
-            panel.updatePositions(positions)
-            Swing.onEDT { panel.repaint() }
-            ref ! Drew()
         Behaviors.same
