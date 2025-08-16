@@ -36,9 +36,9 @@ object BoidActor:
   def apply(initial: Boid): Behavior[Command] = Behaviors.setup: _ =>
     active(initial, v2d(0), v2d(0), v2d(0))
 
-  type Separation = V2d
-  type Alignment = V2d
-  type Cohesion = V2d
+  private type Separation = V2d
+  private type Alignment = V2d
+  private type Cohesion = V2d
 
   private def active(
       _boid: Boid,
@@ -54,6 +54,7 @@ object BoidActor:
       case RequestCalcVelocity(boids, avoidRadius, perceptionRadius, ref) =>
         val (newSep, newAli, newCoh) =
           calcVelocity(_boid, boids, avoidRadius, perceptionRadius)
+        // println(s"sep: $newSep -- ali: $newAli -- coh: $newCoh ")
         ref ! TaskDone()
         active(_boid, newSep, newAli, newCoh)
 
@@ -94,15 +95,13 @@ object BoidActor:
       cohWeight: Double,
       maxSpeed: Double
   ): Boid =
-    // println(s"-> $aliWeight - $sepWeight - $cohWeight")
-    val updBoid = boid.copy(vel =
+    var updBoid = boid.copy(vel =
       boid.vel + (ali * aliWeight) + (sep * sepWeight) + (coh * cohWeight)
     )
     val speed = updBoid.vel.abs
     if speed > maxSpeed then
-      updBoid.copy(vel = updBoid.vel.norm * maxSpeed)
-    else
-      updBoid
+      updBoid = updBoid.copy(vel = updBoid.vel.norm * maxSpeed)
+    updBoid
 
   private def updPosition(width: Double, height: Double, boid: Boid): Boid =
     var updBoid = boid.copy(pos = boid.pos + boid.vel)

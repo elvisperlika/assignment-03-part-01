@@ -18,7 +18,7 @@ case class Boid(
         }
       val avgVx = sumVx / nearbyBoids.size
       val avgVy = sumVy / nearbyBoids.size
-      V2d(avgVx - vel.x, avgVy - vel.y).norm
+      V2d(avgVx, avgVy).norm
     else V2d(0, 0)
 
   def calculateCohesion(nearbyBoids: Seq[Boid]): V2d =

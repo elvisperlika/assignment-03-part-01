@@ -65,7 +65,7 @@ object BoidsSimulator:
             case Failure(exception) => println(s"ERROR: $exception")
             case Success(_)         =>
               drawer ! DrawBoids(model.boids.map(_.pos))
-              context.scheduleOnce(15.millis, context.self, Tick())
+              context.scheduleOnce(16.millis, context.self, Tick())
           }
           Behaviors.same
 
