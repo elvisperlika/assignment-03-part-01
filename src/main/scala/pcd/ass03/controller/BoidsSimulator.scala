@@ -23,6 +23,7 @@ object BoidsSimulator:
   case class Play() extends SimulationPhase
   case class Pause() extends SimulationPhase
   case class Reset() extends SimulationPhase
+  case class SetBoidSize(size: Int) extends SimulationPhase
   private case class Tick() extends SimulationPhase
 
   object ControllerActor:
@@ -79,14 +80,33 @@ object BoidsSimulator:
           Behaviors.same
 
         case Reset() =>
+          model.boidsRef.foreach { br => context watch br }
           model.boidsRef.foreach(_ ! Kill())
-          if model.boidsRef.isEmpty then
-            model generateBoids context
-            drawer ! DrawBoids(model.boids.map(_.pos))
+          killingActors(model, drawer, dashboard)
+
+        case SetBoidSize(size) =>
+          model.nBoids = size
           Behaviors.same
 
         case _ =>
           Behaviors.same
+
+    private def killingActors(
+        model: BoidsModel,
+        drawer: ActorRef[DrawMessage],
+        dashboard: ActorRef[Commands]
+    ): Behavior[SimulationPhase] =
+      Behaviors.receiveSignal {
+        case (context, akka.actor.typed.Terminated(ref)) =>
+          model.boidsRef =
+            model.boidsRef.filterNot(_ == ref) // remove terminated boid
+          if model.boidsRef.isEmpty then
+            model generateBoids context
+            context.self ! Play()
+            running(model, drawer, dashboard, paused = true)
+          else
+            Behaviors.same
+      }
 
 private def requestCalculateVelocities(model: BoidsModel)(using
     Timeout,

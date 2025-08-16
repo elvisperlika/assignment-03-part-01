@@ -6,13 +6,15 @@ import pcd.ass03.controller.BoidsSimulator.{
   Pause,
   Play,
   Reset,
+  SetBoidSize,
   SimulationPhase,
   UpdateParameters
 }
 import pcd.ass03.utils.P2d
 import pcd.ass03.view.{BoidsPanel, BoidsView}
 
-import scala.swing.event.{ButtonClicked, Event, ValueChanged}
+import java.awt.Color
+import scala.swing.event.{ButtonClicked, EditDone, Event, ValueChanged}
 import scala.swing.Swing
 
 object ViewActors:
@@ -43,6 +45,8 @@ object ViewActors:
         }
         view.resetButton.reactions += {
           case ButtonClicked(_) =>
+            view.playPauseButton.text = "Pause"
+            controllerActor ! SetBoidSize(view.nBoidsField.text.toInt)
             controllerActor ! Reset()
         }
 

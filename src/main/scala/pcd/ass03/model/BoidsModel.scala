@@ -33,7 +33,6 @@ class BoidsModel(
     boidsRef =
       for (b, i) <- boids.zipWithIndex
       yield context spawn (BoidActor(b), s"boid-$i")
-    boidsRef.foreach { br => context watch br }
 
   def getMinX: Double = -width / 2
 

@@ -2,7 +2,7 @@ package pcd.ass03.view
 
 import scala.swing.*
 
-class BoidsView(width: Int, height: Int) extends MainFrame:
+class BoidsView(width: Int, height: Int, nBoids: Int) extends MainFrame:
   title = "Boids Simulation"
   preferredSize = new Dimension(width, height)
 
@@ -10,7 +10,8 @@ class BoidsView(width: Int, height: Int) extends MainFrame:
 
   val playPauseButton = new Button("Play")
 
-  val nBoidsField: TextField = new TextField:
+  val nBoidsField: TextField = new TextField():
+    text = nBoids.toString
     columns = 7
 
   private def makeSlider(): Slider = new Slider:
