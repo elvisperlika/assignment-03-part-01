@@ -40,7 +40,7 @@ object BoidsSimulator:
     private def running(
         model: BoidsModel,
         drawer: ActorRef[DrawMessage],
-        dashboard: ActorRef[Commands],
+        dashboard: ActorRef[Nothing],
         paused: Boolean
     ): Behavior[SimulationPhase] = Behaviors receive: (context, message) =>
       message match
@@ -94,7 +94,7 @@ object BoidsSimulator:
     private def killingActors(
         model: BoidsModel,
         drawer: ActorRef[DrawMessage],
-        dashboard: ActorRef[Commands]
+        dashboard: ActorRef[Nothing]
     ): Behavior[SimulationPhase] =
       Behaviors.receiveSignal {
         case (context, akka.actor.typed.Terminated(ref)) =>

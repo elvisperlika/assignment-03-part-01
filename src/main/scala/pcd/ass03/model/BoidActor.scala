@@ -54,7 +54,6 @@ object BoidActor:
       case RequestCalcVelocity(boids, avoidRadius, perceptionRadius, ref) =>
         val (newSep, newAli, newCoh) =
           calcVelocity(_boid, boids, avoidRadius, perceptionRadius)
-        // println(s"sep: $newSep -- ali: $newAli -- coh: $newCoh ")
         ref ! TaskDone()
         active(_boid, newSep, newAli, newCoh)
 

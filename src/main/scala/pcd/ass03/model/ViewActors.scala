@@ -19,20 +19,13 @@ import scala.swing.Swing
 
 object ViewActors:
 
-  enum Commands:
-    case Play
-    case Pause
-    case Reset
-    case SliderChange(separation: Int, alignment: Int, cohesion: Int)
-    case NumBoidsChanged(n: Int)
-
   /** Actor that get commands from the user and send to the controller.
     */
   object Dashboard:
     def apply(
         view: BoidsView,
         controllerActor: ActorRef[SimulationPhase]
-    ): Behavior[Commands] = Behaviors.setup: context =>
+    ): Behavior[Nothing] = Behaviors.setup: context =>
       Behaviors.setup: context =>
         view.playPauseButton.reactions += {
           case ButtonClicked(_) =>
